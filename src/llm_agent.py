@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from typing import Dict, Any, Protocol
+from src.tool_registry import build_default_tool_registry
+from src.response_generator import generate_grounded_answer
 
 import pandas as pd
 
@@ -164,6 +166,24 @@ def generate_rule_based_answer(
 
     return "\n".join(answer_parts)
 
+def map_sql_tool_to_registry_name(sql_tool: str) -> str:
+    """
+    Map sql_tools.py selector names to tool registry names.
+    """
+
+    mapping = {
+        "sales_by_category": "sql_sales_by_category",
+        "sales_by_region": "sql_sales_by_region",
+        "campaign_performance": "sql_campaign_performance",
+        "channel_performance": "sql_channel_performance",
+        "monthly_sales_trend": "sql_monthly_sales_trend",
+    }
+
+    if sql_tool not in mapping:
+        raise ValueError(f"Unknown SQL tool mapping: {sql_tool}")
+
+    return mapping[sql_tool]
+
 
 def run_agent(
     question: str,
@@ -175,7 +195,8 @@ def run_agent(
 
     It decides whether to call KPI tools, RAG retrieval, or both.
     """
-
+    
+    tool_registry = build_default_tool_registry()
     task_type = classify_question(question)
 
     data_result = None
@@ -186,26 +207,27 @@ def run_agent(
     if task_type == "sql":
         sql_tool = select_sql_tool(question)
         if sql_tool is not None:
-            data_result = run_selected_sql_tool(sql_tool)
-            tools_used.append(f"sql_tool:{sql_tool}")
+            registry_tool_name = map_sql_tool_to_registry_name(sql_tool)
+            data_result = tool_registry.run_tool(registry_tool_name)
+            tools_used.append(f"tool_registry:{registry_tool_name}")
 
     elif task_type == "mixed":
         sql_tool = select_sql_tool(question)
 
         if "roi" in question.lower():
-            data_result = calculate_promotion_roi(df)
+            data_result = tool_registry.run_tool("calculate_promotion_roi", df=df)
             tools_used.append("calculate_promotion_roi")
         elif "uplift" in question.lower():
-            data_result = calculate_sales_uplift(df)
+            data_result = tool_registry.run_tool("calculate_sales_uplift", df=df)
             tools_used.append("calculate_sales_uplift")
         elif "anomaly" in question.lower() or "abnormal" in question.lower() or "spike" in question.lower():
-            data_result = detect_anomalies(df)
+            data_result = tool_registry.run_tool("detect_anomalies", df=df)
             tools_used.append("detect_anomalies")
         elif sql_tool is not None:
             data_result = run_selected_sql_tool(sql_tool)
             tools_used.append(f"sql_tool:{sql_tool}")
         else:
-            data_result = summarize_by_category(df)
+            data_result = tool_registry.run_tool("summarize_by_category", df=df)
             tools_used.append("summarize_by_category")
 
     elif task_type == "roi":
@@ -234,9 +256,10 @@ def run_agent(
         )
         tools_used.append("rag_retrieval")
 
-    answer = generate_rule_based_answer(
+    answer = generate_grounded_answer(
         question=question,
         task_type=task_type,
+        tools_used=tools_used,
         data_result=data_result,
         retrieved_context=retrieved_context,
     )

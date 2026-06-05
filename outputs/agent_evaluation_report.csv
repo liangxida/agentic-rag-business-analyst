@@ -1,0 +1,9 @@
+question_id,question,question_type,task_type_detected,expected_tool_signal,tools_used,expected_tool_used,retrieved_chunk_count,data_output_rows,retrieval_relevance,tool_correctness,answer_completeness,hallucination_risk,latency_seconds
+Q001,Which category had the highest sales uplift?,kpi_analysis,uplift,calculate_sales_uplift,calculate_sales_uplift,True,0,16,not_applicable,pass,pass,low,0.032
+Q002,Which region had the strongest promotion ROI?,kpi_analysis,roi,calculate_promotion_roi,calculate_promotion_roi,True,0,16,not_applicable,pass,pass,low,0.012
+Q003,Show total sales by category.,sql_analysis,sql,sql_sales_by_category,tool_registry:sql_sales_by_category,True,0,4,not_applicable,pass,pass,low,0.004
+Q004,Show monthly sales trend.,sql_analysis,sql,sql_monthly_sales_trend,tool_registry:sql_monthly_sales_trend,True,0,3,not_applicable,pass,pass,low,0.002
+Q005,Compare campaign performance.,sql_analysis,sql,sql_campaign_performance,tool_registry:sql_campaign_performance,True,0,4,not_applicable,pass,pass,low,0.002
+Q006,Explain what promotion ROI means in this business context.,rag_context,mixed,rag_retrieval,calculate_promotion_roi | rag_retrieval,True,3,16,0.516,pass,pass,low,0.032
+Q007,Why should we separate promotional impact from organic demand growth?,rag_context,mixed,rag_retrieval,summarize_by_category | rag_retrieval,True,3,4,0.449,pass,pass,low,0.033
+Q008,Are there any abnormal sales spikes?,anomaly_detection,anomaly,detect_anomalies,detect_anomalies,True,0,14,not_applicable,pass,pass,low,0.004

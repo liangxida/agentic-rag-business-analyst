@@ -15,7 +15,7 @@ from src.embedding_rag_pipeline import build_chroma_retriever_from_file
 from src.llm_agent import run_agent
 from src.evaluation import evaluate_agent_response, current_time
 from src.sql_tools import create_sqlite_database
-
+from src.tool_registry import build_default_tool_registry
 
 st.set_page_config(
     page_title="Agentic RAG Business Analyst",
@@ -33,7 +33,7 @@ st.write(
 )
 
 
-DEFAULT_DATA_PATH = "data/sample_sales.csv"
+DEFAULT_DATA_PATH = "data/cleaned_sales.csv"
 DEFAULT_CONTEXT_PATH = "data/business_context.md"
 
 
@@ -87,10 +87,16 @@ create_sqlite_database(csv_path=data_path)
 
 
 
-tab1, tab2, tab3, tab4 = st.tabs(
-    ["Ask Agent", "Data Overview", "Data Quality", "Project Notes"]
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+    [
+        "Ask Agent",
+        "Data Overview",
+        "Data Quality",
+        "ETL Pipeline",
+        "Tool Registry",
+        "Project Notes",
+    ]
 )
-
 
 with tab1:
     st.subheader("Ask a Business Question")
@@ -147,17 +153,189 @@ with tab2:
 
 
 with tab3:
-    st.subheader("Data Quality Report")
+    st.subheader("Data Quality")
+
+    st.write(
+        """
+        This tab shows both in-memory data validation results and the ETL-generated
+        data quality report used to prepare cleaned data for downstream agent tools.
+        """
+    )
+
+    st.markdown("### In-memory Data Quality Report")
+
     quality_report = validate_sales_data(df)
     st.dataframe(quality_report, use_container_width=True)
 
+    st.markdown("### ETL-generated Data Quality Report")
+
+    quality_report_path = "outputs/data_quality_report.csv"
+
+    if os.path.exists(quality_report_path):
+        etl_quality_report = pd.read_csv(quality_report_path)
+        st.dataframe(etl_quality_report, use_container_width=True)
+
+        st.markdown("### Data Quality Status Summary")
+
+        status_summary = (
+            etl_quality_report.groupby("status")
+            .size()
+            .reset_index(name="count")
+            .sort_values("count", ascending=False)
+        )
+
+        st.dataframe(status_summary, use_container_width=True)
+
+        st.markdown("### Rows Before and After Cleaning")
+
+        row_summary = etl_quality_report[
+            etl_quality_report["check_name"].isin(
+                ["rows_before_cleaning", "rows_after_cleaning"]
+            )
+        ][["check_name", "result"]]
+
+        st.dataframe(row_summary, use_container_width=True)
+
+    else:
+        st.warning("ETL data quality report not found. Run `python run_pipeline.py` first.")
+
+    st.markdown("### KPI-ready Feature Columns")
+
+    engineered_columns = [
+        "month",
+        "week",
+        "revenue_per_unit",
+        "is_discounted",
+        "promotion_intensity",
+        "sales_per_promotion_dollar",
+    ]
+
+    existing_engineered_columns = [col for col in engineered_columns if col in df.columns]
+
+    if existing_engineered_columns:
+        st.write(existing_engineered_columns)
+        st.dataframe(df[existing_engineered_columns].head(10), use_container_width=True)
+    else:
+        st.warning("No engineered KPI feature columns found in the current dataset.")
+
 
 with tab4:
-    st.subheader("Project Positioning")
+    st.subheader("ETL Pipeline and Automated Agent Evaluation")
+
     st.write(
         """
-        This project is designed to demonstrate practical AI/data skills for GenAI,
-        AI agent, product analytics, and data analyst roles.
+        This tab summarizes the automated pipeline and evaluates whether the agent
+        selects the expected tools for predefined business questions.
+        """
+    )
+
+    st.markdown("### ETL Pipeline Flow")
+
+    st.code(
+        """
+Raw sales CSV
+  → schema validation
+  → data quality checks
+  → cleaning and type standardization
+  → KPI-ready feature transformation
+  → cleaned CSV export
+  → SQLite database refresh
+  → downstream SQL and KPI tools
+        """
+    )
+
+    st.markdown("### ETL Outputs")
+    st.write("- `data/cleaned_sales.csv`")
+    st.write("- `outputs/data_quality_report.csv`")
+    st.write("- `outputs/agent_evaluation_report.csv`")
+    st.write("- `data/business_analytics.db`")
+
+    st.markdown("### Automated Agent Evaluation Report")
+
+    agent_eval_path = "outputs/agent_evaluation_report.csv"
+
+    if os.path.exists(agent_eval_path):
+        agent_eval_report = pd.read_csv(agent_eval_path)
+        st.dataframe(agent_eval_report, use_container_width=True)
+
+        if "expected_tool_used" in agent_eval_report.columns:
+            expected_tool_accuracy = agent_eval_report["expected_tool_used"].mean()
+
+            st.metric(
+                label="Expected Tool Usage Accuracy",
+                value=f"{expected_tool_accuracy:.0%}",
+            )
+
+        if "latency_seconds" in agent_eval_report.columns:
+            latency_numeric = pd.to_numeric(
+                agent_eval_report["latency_seconds"],
+                errors="coerce",
+            )
+
+            st.metric(
+                label="Average Latency",
+                value=f"{latency_numeric.mean():.3f}s",
+            )
+
+        if "hallucination_risk" in agent_eval_report.columns:
+            risk_summary = (
+                agent_eval_report.groupby("hallucination_risk")
+                .size()
+                .reset_index(name="count")
+                .sort_values("count", ascending=False)
+            )
+
+            st.markdown("### Hallucination Risk Summary")
+            st.dataframe(risk_summary, use_container_width=True)
+
+    else:
+        st.warning("Agent evaluation report not found. Run `python run_pipeline.py` first.")
+
+with tab5:
+    st.subheader("Plugin-style Tool Registry")
+
+    st.write(
+        """
+        The agent uses a plugin-style tool registry to organize SQL tools,
+        KPI analysis tools, and other modular skills. This design makes the
+        agent workflow easier to extend with new tools.
+        """
+    )
+
+    tool_registry = build_default_tool_registry()
+    tool_table = tool_registry.list_tools()
+
+    st.markdown("### Registered Tools")
+    
+    st.dataframe(tool_table, use_container_width=True)
+
+    st.markdown("### Tool Categories")
+    category_summary = (
+        tool_table.groupby("category")
+        .size()
+        .reset_index(name="tool_count")
+        .sort_values("tool_count", ascending=False)
+    )
+    st.dataframe(category_summary, use_container_width=True)
+
+    st.markdown("### Why this matters")
+    st.write(
+        """
+        Instead of hard-coding every action inside a single function, tools are
+        registered with metadata including name, category, input type, output type,
+        and description. This approximates a skills/plugins framework for applied
+        AI agents.
+        """
+    )
+
+with tab6:
+    st.subheader("Project Notes")
+
+    st.write(
+        """
+        This project is designed to demonstrate practical Applied AI Data Science skills,
+        including RAG, SQL tool calling, ETL automation, data quality validation,
+        plugin-style tool registry, KPI analysis, and agent evaluation.
         """
     )
 
@@ -172,12 +350,18 @@ with tab4:
         - Vector database with Chroma
         - Semantic search
         - Retrieval scoring
-        - Tool calling
+        - SQL tool calling
+        - Plugin-style skills framework
+        - Modular tool registry
+        - ETL pipeline
+        - Data validation
+        - Data quality reporting
+        - Automated agent evaluation
         - KPI analysis
         - Promotion ROI
         - Sales uplift
-        - Data validation
-        - LLM evaluation framework
+        - Hallucination risk tracking
+        - Latency tracking
         - Streamlit business prototype
         """
     )

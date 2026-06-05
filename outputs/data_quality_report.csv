@@ -1,0 +1,33 @@
+check_type,check_name,result,status,details
+schema,required_column_date,True,pass,
+schema,required_column_product_id,True,pass,
+schema,required_column_category,True,pass,
+schema,required_column_region,True,pass,
+schema,required_column_channel,True,pass,
+schema,required_column_sales,True,pass,
+schema,required_column_units_sold,True,pass,
+schema,required_column_promotion_flag,True,pass,
+schema,required_column_discount_rate,True,pass,
+schema,required_column_campaign_name,True,pass,
+schema,required_column_promotion_cost,True,pass,
+schema,extra_columns,0,info,No extra columns
+completeness,row_count,1440,info,Total number of rows in the dataset
+uniqueness,duplicate_rows,0,pass,No duplicate rows
+completeness,missing_values_date,0,pass,0 missing values in date
+completeness,missing_values_product_id,0,pass,0 missing values in product_id
+completeness,missing_values_category,0,pass,0 missing values in category
+completeness,missing_values_region,0,pass,0 missing values in region
+completeness,missing_values_channel,0,pass,0 missing values in channel
+completeness,missing_values_sales,0,pass,0 missing values in sales
+completeness,missing_values_units_sold,0,pass,0 missing values in units_sold
+completeness,missing_values_promotion_flag,0,pass,0 missing values in promotion_flag
+completeness,missing_values_discount_rate,0,pass,0 missing values in discount_rate
+completeness,missing_values_campaign_name,0,pass,0 missing values in campaign_name
+completeness,missing_values_promotion_cost,0,pass,0 missing values in promotion_cost
+validity,negative_sales,0,pass,Sales should not be negative
+validity,negative_units_sold,0,pass,Units sold should not be negative
+validity,invalid_promotion_flag,0,pass,promotion_flag should be 0 or 1
+validity,invalid_discount_rate,0,pass,discount_rate should be between 0 and 1
+outlier,sales_outliers_z_score_3,1,warning,Rows with absolute sales z-score >= 3
+etl_summary,rows_before_cleaning,1440,info,Number of rows before cleaning
+etl_summary,rows_after_cleaning,1440,info,Number of rows after cleaning and transformation
