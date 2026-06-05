@@ -41,36 +41,61 @@ Raw sales CSV
   → SQLite database refresh
   → downstream SQL and KPI tools
 
+## System Architecture
+
+```text
+Raw Sales Data
+    ↓
+ETL Pipeline
+    ├── Schema Validation
+    ├── Data Quality Checks
+    ├── Cleaning
+    └── KPI Feature Transformation
+    ↓
+Cleaned Data + SQLite Database
+    ↓
+Plugin-style Tool Registry
+    ├── SQL Tools
+    ├── KPI Analysis Tools
+    ├── Retrieval Tools
+    └── Evaluation Tools
+    ↓
+Agent Router
+    ├── SQL Tool Calling
+    ├── Python Analytical Tools
+    └── RAG Retrieval
+    ↓
+Grounded Response Layer
+    ↓
+Automated Evaluation Report
+    ↓
+Streamlit App
+
+
+# Step 5.7：README 加 Screenshots
+
+```markdown
 ## Screenshots
-
-### SQL Tool Calling
-
-![SQL Tool Calling](screenshots/02_sql_tool_calling.png)
-
-### RAG Retrieval
-
-![RAG Retrieval](screenshots/03_rag_retrieval.png)
-
-### Evaluation Report
-
-![Evaluation Report](screenshots/04_evaluation_report.png)
 
 ### Grounded Agent Response
 
 ![Grounded Agent Response](screenshots/01_ask_agent_grounded_answer.png)
 
-### ETL Pipeline and Data Quality
+### Data Quality Report
 
-![ETL Pipeline and Data Quality](screenshots/02_etl_pipeline_data_quality.png)
+![Data Quality Report](screenshots/02_data_quality_report.png)
 
-### Automated Agent Evaluation
+### ETL Pipeline and Agent Evaluation
 
-![Automated Agent Evaluation](screenshots/03_automated_agent_evaluation.png)
+![ETL Pipeline and Agent Evaluation](screenshots/03_etl_agent_evaluation.png)
 
 ### Plugin-style Tool Registry
 
 ![Tool Registry](screenshots/04_tool_registry.png)
 
+### Data Overview
+
+![Data Overview](screenshots/05_data_overview.png)
 ### Data Overview
 
 ![Data Overview](screenshots/05_data_overview.png)
