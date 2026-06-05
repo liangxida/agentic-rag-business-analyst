@@ -41,8 +41,6 @@ Raw sales CSV
   → downstream SQL and KPI tools
 
 ## System Architecture
-
-```text
 Raw Sales Data
     ↓
 ETL Pipeline
@@ -76,24 +74,22 @@ Streamlit App
 
 ![Grounded Agent Response](screenshots/01_ask_agent_grounded_answer.png)
 
+### Data Overview
+
+![Data Overview](screenshots/02_data_overview.png)
+
 ### Data Quality Report
 
-![Data Quality Report](screenshots/02_data_quality_report.png)
+![Data Quality Report](screenshots/03_data_quality_report.png)
 
 ### ETL Pipeline and Agent Evaluation
 
-![ETL Pipeline and Agent Evaluation](screenshots/03_etl_agent_evaluation.png)
+![ETL Pipeline and Agent Evaluation](screenshots/04_etl_agent_evaluation.png)
 
 ### Plugin-style Tool Registry
 
-![Tool Registry](screenshots/04_tool_registry.png)
+![Tool Registry](screenshots/05_tool_registry.png)
 
-### Data Overview
-
-![Data Overview](screenshots/05_data_overview.png)
-### Data Overview
-
-![Data Overview](screenshots/05_data_overview.png)
 
 ## Tech Stack
 
