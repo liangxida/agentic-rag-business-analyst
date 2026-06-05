@@ -31,7 +31,6 @@ The project includes an automated ETL pipeline that prepares structured business
 
 Pipeline steps:
 
-```text
 Raw sales CSV
   → schema validation
   → data quality checks
@@ -71,10 +70,6 @@ Automated Evaluation Report
     ↓
 Streamlit App
 
-
-# Step 5.7：README 加 Screenshots
-
-```markdown
 ## Screenshots
 
 ### Grounded Agent Response
@@ -114,7 +109,6 @@ Streamlit App
 
 ## Project Structure
 
-```text
 agentic-rag-business-analyst/
   app.py
   run_pipeline.py
@@ -144,39 +138,6 @@ agentic-rag-business-analyst/
     evaluation.py
     agent_evaluator.py
 
-  screenshots/
-
-## System Architecture
-
-```text
-Raw Sales Data
-    ↓
-ETL Pipeline
-    ├── Schema Validation
-    ├── Data Quality Checks
-    ├── Cleaning
-    └── KPI Feature Transformation
-    ↓
-Cleaned Data + SQLite Database
-    ↓
-Plugin-style Tool Registry
-    ├── SQL Tools
-    ├── KPI Analysis Tools
-    ├── Retrieval Tools
-    └── Evaluation Tools
-    ↓
-Agent Router
-    ├── SQL Tool Calling
-    ├── Python Analytical Tools
-    └── RAG Retrieval
-    ↓
-Grounded Response Layer
-    ↓
-Automated Evaluation Report
-    ↓
-Streamlit App
-
-```markdown
 ## How to Run
 
 Create and activate a virtual environment:
