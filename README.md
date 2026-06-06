@@ -40,57 +40,6 @@ Raw sales CSV
   → SQLite database refresh
   → downstream SQL and KPI tools
 
-## System Architecture
-Raw Sales Data
-    ↓
-ETL Pipeline
-    ├── Schema Validation
-    ├── Data Quality Checks
-    ├── Cleaning
-    └── KPI Feature Transformation
-    ↓
-Cleaned Data + SQLite Database
-    ↓
-Plugin-style Tool Registry
-    ├── SQL Tools
-    ├── KPI Analysis Tools
-    ├── Retrieval Tools
-    └── Evaluation Tools
-    ↓
-Agent Router
-    ├── SQL Tool Calling
-    ├── Python Analytical Tools
-    └── RAG Retrieval
-    ↓
-Grounded Response Layer
-    ↓
-Automated Evaluation Report
-    ↓
-Streamlit App
-
-## Screenshots
-
-### Grounded Agent Response
-
-![Grounded Agent Response](screenshots/01_ask_agent_grounded_answer.png)
-
-### Data Overview
-
-![Data Overview](screenshots/02_data_overview.png)
-
-### Data Quality Report
-
-![Data Quality Report](screenshots/03_data_quality_report.png)
-
-### ETL Pipeline and Agent Evaluation
-
-![ETL Pipeline and Agent Evaluation](screenshots/04_etl_agent_evaluation.png)
-
-### Plugin-style Tool Registry
-
-![Tool Registry](screenshots/05_tool_registry.png)
-
-
 ## Tech Stack
 
 - Python
